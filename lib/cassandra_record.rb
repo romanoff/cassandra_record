@@ -2,7 +2,8 @@ require 'rubygems'
 require 'active_model'
 require 'hash'
 require 'set'
-# require 'cassandra/0.7'
+require 'cassandra/0.7'
+require 'yaml'
 
 module CassandraRecord
   class Base
@@ -18,9 +19,19 @@ module CassandraRecord
     self.include_root_in_json = false
 
     module ConnectionManagement
-      def esteblish_connection(keyspace_name, *args)
-        # @connection = Cassandra.new(keyspace_name)
+      
+      attr_reader :connection
+      
+      def establish_connection(args)
+        host = args[:host]||'localhost'
+        port = args[:port].to_s||'9160'
+        @connection = connection_class.new(args[:keyspace], host+':'+port )
       end
+
+      def connection_class
+        Cassandra
+      end
+
     end
     extend ConnectionManagement
 
